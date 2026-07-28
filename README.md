@@ -30,8 +30,8 @@ cd Intern-Rag-Project
 Install the required packages:
 
 ```bash
-pip install -r app/searchAPI/requirements.txt
-pip install -r app/rerankerAPI/requirements.txt
+pip install -r app/searchAPI/requirments.txt
+pip install -r app/rerankerAPI/requirments.txt
 ```
 
 Run the project:
