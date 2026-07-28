@@ -1,0 +1,48 @@
+services:
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - rag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  reranker:
+    container_name: rag-reranker
+    build: ./app/rerankerAPI
+    ports:
+      - "8001:8001"
+    networks:
+      - rag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    container_name: rag-api
+    build: ./app/searchAPI
+    ports:
+      - "8000:8000"
+    networks:
+      - rag-network
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      reranker:
+        condition: service_healthy
+
+volumes:
+  qdrant_storage:
+
+networks:
+  rag-network:
