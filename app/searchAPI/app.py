@@ -26,14 +26,15 @@ def search(request: SearchRequest):
       # Get the text of each chunk
     candidates = [result["text"] for result in results]
 
-
+    url = os.getenv("RERANKER_URL")
+    print(f"URL = {url!r}")
     # Call the reranker and pass the parameters 
     response = httpx.post(
     os.getenv("RERANKER_URL"),
     json={
         "question": request.question,
         "candidates": candidates
-    }
+    },timeout=120
 )
 
     scores = response.json()["scores"]

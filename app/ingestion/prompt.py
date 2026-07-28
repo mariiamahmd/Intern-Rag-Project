@@ -1,19 +1,53 @@
 def generate_text(question, retrieved_chunks, top_k=3):
 
-    context = ""
+    contexts = []
 
-    for i, chunk in enumerate(retrieved_chunks[:top_k], start=1):
+    for chunk in retrieved_chunks[:top_k]:
 
-        context += f"Context {i}\n"
-        context += f"Text:\n{chunk['text']}\n\n"
+        section = f"""
+Purchase Order Information
 
-        context += "Metadata:\n"
+{chunk["text"]}
+"""
+
+        metadata = []
 
         for key, value in chunk.items():
             if key != "text":
-                context += f"- {key}: {value}\n"
+                metadata.append(f"{key}: {value}")
 
-        context += "\n" + "=" * 60 + "\n\n"
+        if metadata:
+            section += "\n\nDetails:\n"
+            section += "\n".join(metadata)
+
+        contexts.append(section.strip())
+
+    context = "\n\n-----------------------------\n\n".join(contexts)
+
+    prompt = f"""
+You are a helpful assistant answering questions about purchase orders.
+
+Answer ONLY using the information provided below.
+
+Rules:
+- Use only the provided information.
+- Do not use outside knowledge.
+- Do not repeat or quote the context.
+- Answer naturally, as if speaking to a user.
+- If multiple purchase orders match, list them clearly.
+- If the answer is not present, reply exactly:
+I don't know.
+
+Purchase Orders:
+{context}
+
+Question:
+{question}
+
+Answer:
+"""
+
+    return prompt
 
     prompt = f"""
 You are a helpful assistant answering questions about purchase orders.

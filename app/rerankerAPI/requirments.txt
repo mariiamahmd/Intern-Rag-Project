@@ -1,3 +1,0 @@
-fastapi
-pydantic
-sentence_transformers
